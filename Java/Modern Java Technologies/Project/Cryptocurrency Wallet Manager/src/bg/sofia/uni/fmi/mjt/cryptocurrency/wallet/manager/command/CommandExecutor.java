@@ -48,7 +48,7 @@ public class CommandExecutor {
 
     public String execute(User user, Command cmd) throws URISyntaxException {
         return switch (cmd.command()) {
-            case OFFERINGS -> list_offerings(cmd.arguments());
+            case OFFERINGS -> list_offerings(user, cmd.arguments());
             case REGISTER -> register(user, cmd.arguments());
             case LOGIN -> login(user, cmd.arguments());
             case DEPOSIT -> deposit(user, cmd.arguments());
@@ -57,8 +57,8 @@ public class CommandExecutor {
             case SUMMARY -> summary(user, cmd.arguments());
             case OVERALL_SUMMARY -> overall_summary(user, cmd.arguments());
             case LOGOUT -> logout(user, cmd.arguments());
-            case DISCONNECT -> disconnect(user);
-            case HELP -> help();
+            case DISCONNECT -> disconnect(user, cmd.arguments());
+            case HELP -> help(cmd.arguments());
             case REQUEST_OFFERINGS -> request_offerings();
             default -> "Unknown command.";
         };
@@ -82,14 +82,15 @@ public class CommandExecutor {
         return "Successfully requested offerings.";
     }
 
-    public String list_offerings(String[] args) throws URISyntaxException {
+    public String list_offerings(User user, String[] args) throws URISyntaxException {
         if (args.length != 0) {
             return String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, OFFERINGS, 0, OFFERINGS);
         }
+        if (user == null) {
+            return "You are not logged in.";
+        }
         offers.clear();
-
-        request_offerings();
-
+        //request_offerings();
         StringBuilder response = new StringBuilder(String.format("Offerings:%n"));
 
         offers.stream()
@@ -131,10 +132,10 @@ public class CommandExecutor {
             return "No such user.";
         } else {
             if (current_user.getIsLogged()) {
-                return "User already logged.";
+                return "Other user already logged in.";
             } else {
                 StringBuilder response = new StringBuilder("");
-                response.append(String.format("%s successfully logged.", args[0]));
+                response.append(String.format("%s successfully logged in.", args[0]));
                 current_user.login();
                 return response.toString();
             }
@@ -249,14 +250,20 @@ public class CommandExecutor {
         return response.toString();
     }
 
-    public String disconnect(User user) {
+    public String disconnect(User user, String[] args) {
+        if (args.length != 0) {
+            return String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, DISCONNECT, 0, DISCONNECT);
+        }
         if (user != null) {
             user.logout();
         }
         return "Disconnected from the server.";
     }
 
-    public String help() {
+    public String help(String[] args) {
+        if (args.length != 0) {
+            return String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, HELP, 0, HELP);
+        }
         StringBuilder response = new StringBuilder("");
         response.append(String.format("%s %s%n", REGISTER, " <username> <password>"));
         response.append(String.format("%s %s%n", LOGIN, " <username> <password>"));
