@@ -64,7 +64,7 @@ public class CommandExecutor {
         HttpClient client = HttpClient.newBuilder().build();
         URI uri = new URI("https", "rest.coinapi.io", "/v1/assets/", null);
         HttpRequest request = HttpRequest.newBuilder()
-                .header("X-CoinAPI-Key", "55F0BA5A-E044-4BA5-BC0F-79ADE6277F6C")
+                .header("X-CoinAPI-Key", "INPUT HERE YOUR API KEY")
                 .uri(uri)
                 .build();
         Gson gson = new Gson();
