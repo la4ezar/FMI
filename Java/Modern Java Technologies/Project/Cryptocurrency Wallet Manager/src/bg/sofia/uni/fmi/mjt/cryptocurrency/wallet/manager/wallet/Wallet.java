@@ -62,7 +62,7 @@ public class Wallet {
     }
 
     public String summary() {
-        StringBuilder result = new StringBuilder(String.format("Amound of money in the wallet: %f%n", money));
+        StringBuilder result = new StringBuilder(String.format("Amount of money in the wallet: %f%n", money));
         result.append(String.format("Cryptocurrencies:%n"));
         for (Iterator<Map.Entry<Integer, Cryptocurrency>> it = cryptos.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Integer, Cryptocurrency> entry = it.next();

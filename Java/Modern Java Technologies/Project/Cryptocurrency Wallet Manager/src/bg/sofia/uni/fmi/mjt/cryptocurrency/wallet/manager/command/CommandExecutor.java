@@ -5,7 +5,6 @@ import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.user.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,9 +36,6 @@ public class CommandExecutor {
 
     private Map<String, User> users;
     private final List<Offer> offers;
-
-    // COIN API KEY
-    // 55F0BA5A-E044-4BA5-BC0F-79ADE6277F6C
 
     public CommandExecutor(Map<String, User> users) {
         this.users = users;
@@ -82,14 +78,14 @@ public class CommandExecutor {
         return "Successfully requested offerings.";
     }
 
-    public String list_offerings(User user, String[] args) throws URISyntaxException {
+    public String list_offerings(User user, String[] args) {
         if (args.length != 0) {
             return String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, OFFERINGS, 0, OFFERINGS);
         }
         if (user == null) {
             return "You are not logged in.";
         }
-        offers.clear();
+        //offers.clear();
         //request_offerings();
         StringBuilder response = new StringBuilder(String.format("Offerings:%n"));
 
