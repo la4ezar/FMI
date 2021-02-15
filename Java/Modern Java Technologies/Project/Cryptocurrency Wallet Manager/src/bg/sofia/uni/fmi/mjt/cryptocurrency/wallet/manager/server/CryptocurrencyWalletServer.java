@@ -75,57 +75,47 @@ public class CryptocurrencyWalletServer {
             request_offerings(list_offerings_thread);
 
             while (isServerWorking) {
-                try {
-                    int readyChannels = selector.select(1);
-                    if (readyChannels == 0) {
-                        continue;
-                    }
+                int readyChannels = selector.select(1);
+                if (readyChannels == 0) {
+                    continue;
+                }
 
-                    Iterator<SelectionKey> keyIterator = selector.selectedKeys().iterator();
-                    while (keyIterator.hasNext()) {
-                        SelectionKey key = keyIterator.next();
-                        if (key.isReadable()) {
-                            SocketChannel clientChannel = (SocketChannel) key.channel();
-                            try {
-                                String clientInput = getClientInput(clientChannel);
+                Iterator<SelectionKey> keyIterator = selector.selectedKeys().iterator();
+                while (keyIterator.hasNext()) {
+                    SelectionKey key = keyIterator.next();
+                    if (key.isReadable()) {
+                        SocketChannel clientChannel = (SocketChannel) key.channel();
+                        try {
+                            String clientInput = getClientInput(clientChannel);
 
-                                if (clientInput == null) {
-                                    continue;
-                                }
-                                System.out.println(clientInput);
-
-                                String output = commandExecutor.execute((User) key.attachment(), CommandCreator.newCommand(clientInput));
-
-                                // attach/detach the SelectionKey to/from its user
-                                attachKeyToUser(key, output);
-
-                                writeClientOutput(clientChannel, output + System.lineSeparator());
-                            } catch (IOException e) {
-                                clientChannel.close();
-                                System.out.println("Error occurred while processing client request: " + e.getMessage());
-                                e.printStackTrace(new PrintWriter(
-                                        new FileOutputStream("errors.txt", true)));
+                            if (clientInput == null) {
+                                continue;
                             }
-                        } else if (key.isAcceptable()) {
-                            accept(selector, key);
-                        }
+                            System.out.println(clientInput);
 
-                        keyIterator.remove();
+                            String output = commandExecutor.execute((User) key.attachment(), CommandCreator.newCommand(clientInput));
+
+                            // attach/detach the SelectionKey to/from its user
+                            attachKeyToUser(key, output);
+
+                            writeClientOutput(clientChannel, output + System.lineSeparator());
+                        } catch (IOException e) {
+                            clientChannel.close();
+                            System.out.println("Error occurred while processing client request: " + e.getMessage());
+                            e.printStackTrace(new PrintWriter(
+                                    new FileOutputStream("server_errors.txt", true), true));
+                        }
+                    } else if (key.isAcceptable()) {
+                        accept(selector, key);
                     }
-                } catch (URISyntaxException e) {
-                    System.out.println("Error occurred while creating the URI for offerings request: "
-                            + e.getMessage());
-                    e.printStackTrace(new PrintWriter(new FileOutputStream("errors.txt", true)));
+                    keyIterator.remove();
                 }
             }
-
             list_offerings_thread.shutdown();
             consoleReader.shutdown();
         } catch (IOException e) {
             consoleReader.shutdown();
             throw new UncheckedIOException("Failed to start server.", e);
-            //System.out.println("Failed to start the server.");
-            //e.printStackTrace(new PrintWriter("server_errors.txt"));
         }
     }
 

@@ -5,6 +5,9 @@ import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.user.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,7 +45,7 @@ public class CommandExecutor {
         offers = new ArrayList<>();
     }
 
-    public String execute(User user, Command cmd) throws URISyntaxException {
+    public String execute(User user, Command cmd) {
         return switch (cmd.command()) {
             case OFFERINGS -> list_offerings(user, cmd.arguments());
             case REGISTER -> register(user, cmd.arguments());
@@ -60,11 +63,25 @@ public class CommandExecutor {
         };
     }
 
-    public String request_offerings() throws URISyntaxException {
+    public String request_offerings() {
         HttpClient client = HttpClient.newBuilder().build();
-        URI uri = new URI("https", "rest.coinapi.io", "/v1/assets/", null);
+
+        URI uri = null;
+        try {
+            uri = new URI("https", "rest.coinapi.io", "/v1/assets/", null);
+        } catch (URISyntaxException e) {
+            System.out.println("Error occurred while creating the URI for offerings request: " + e.getMessage());
+            try {
+                e.printStackTrace(new PrintWriter(
+                        new FileOutputStream("server_errors.txt", true), true));
+            } catch (FileNotFoundException fileNotFoundException) {
+                System.out.println("File 'server_errors.txt' was not found.");
+                fileNotFoundException.printStackTrace();
+            }
+        }
+
         HttpRequest request = HttpRequest.newBuilder()
-                .header("X-CoinAPI-Key", "INPUT API KEY HERE")
+                .header("X-CoinAPI-Key", "EXAMPLE API KEY")
                 .uri(uri)
                 .build();
         Gson gson = new Gson();

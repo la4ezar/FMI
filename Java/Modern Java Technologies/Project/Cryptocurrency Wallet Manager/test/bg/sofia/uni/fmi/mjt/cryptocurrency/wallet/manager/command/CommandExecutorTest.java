@@ -5,7 +5,6 @@ import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.user.User;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,14 +36,14 @@ public class CommandExecutorTest {
 
 
     @BeforeClass
-    public static void offeringsRequest() throws URISyntaxException {
+    public static void offeringsRequest() {
         users = new HashMap<>();
         commandExecutor = new CommandExecutor(users);
         commandExecutor.request_offerings();
     }
 
     @Test
-    public void testDefault() throws URISyntaxException {
+    public void testDefault() {
         Command unknown_command = new Command("Unknown command", new String[]{});
 
         String expected = "Unknown command.";
@@ -54,7 +53,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testRegisterSuccess() throws URISyntaxException {
+    public void testRegisterSuccess() {
         users.clear();
         Command register = new Command(REGISTER, new String[]{testUser.getName(), testUser.getPassword()});
 
@@ -65,7 +64,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testRegisterAlreadyRegistered() throws URISyntaxException {
+    public void testRegisterAlreadyRegistered() {
         Command register = new Command(REGISTER, new String[]{testUser.getName(), testUser.getPassword()});
 
         String expected = "User already registered.";
@@ -77,7 +76,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testRegisterWhenCallerIsLoggedIn() throws URISyntaxException {
+    public void testRegisterWhenCallerIsLoggedIn() {
         Command register = new Command(REGISTER, new String[]{testUser.getName(), testUser.getPassword()});
 
         String expected = "You are already logged in.";
@@ -87,7 +86,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testRegisterWithLessArguments() throws URISyntaxException {
+    public void testRegisterWithLessArguments() {
         // register with name only
         Command register = new Command(REGISTER, new String[]{testUser.getName()});
 
@@ -101,7 +100,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testRegisterWithMoreArguments() throws URISyntaxException {
+    public void testRegisterWithMoreArguments() {
         Command register = new Command(REGISTER,
                 new String[]{testUser.getName(), testUser.getPassword(), "Third Argument"});
 
@@ -115,7 +114,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testLoginSuccess() throws URISyntaxException {
+    public void testLoginSuccess() {
         Command login = new Command(LOGIN, new String[]{testUser.getName(), testUser.getPassword()});
         users.put("Lacho", new User("Lacho", "123"));
         users.get("Lacho").logout();
@@ -127,7 +126,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testLoginWithNoSuchUser() throws URISyntaxException {
+    public void testLoginWithNoSuchUser() {
         Command login = new Command(LOGIN, new String[]{"RandomName", testUser.getPassword()});
 
         String expected = "No such user.";
@@ -137,7 +136,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testLoginWhenCallerAlreadyLoggedIn() throws URISyntaxException {
+    public void testLoginWhenCallerAlreadyLoggedIn() {
         Command login = new Command(LOGIN, new String[]{testUser.getName(), testUser.getPassword()});
 
         String expected = "You are already logged in.";
@@ -147,7 +146,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testLoginWhenOtherUserIsAlreadyLoggedIn() throws URISyntaxException {
+    public void testLoginWhenOtherUserIsAlreadyLoggedIn() {
         Command login = new Command(LOGIN, new String[]{testUser.getName(), testUser.getPassword()});
         users.put("Lacho", new User("Lacho", "123"));
 
@@ -158,7 +157,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testLoginWithLessArguments() throws URISyntaxException {
+    public void testLoginWithLessArguments() {
         // login with name only
         Command login = new Command(LOGIN, new String[]{testUser.getName()});
 
@@ -172,7 +171,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testLoginWithMoreArguments() throws URISyntaxException {
+    public void testLoginWithMoreArguments() {
         Command login = new Command(LOGIN,
                 new String[]{testUser.getName(), testUser.getPassword(), "Third Argument"});
 
@@ -186,7 +185,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testDepositSuccess() throws URISyntaxException {
+    public void testDepositSuccess() {
         Command deposit = new Command(DEPOSIT, new String[]{"1000"});
 
         String expected = String.format("%s successfully deposited %f", testUser.getName(), 1000.00);
@@ -196,7 +195,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testDepositWhenNotLoggedIn() throws URISyntaxException {
+    public void testDepositWhenNotLoggedIn() {
         Command deposit = new Command(DEPOSIT, new String[]{"1000,00"});
 
         String expected = "You are not logged in.";
@@ -206,7 +205,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testDepositWithNoArguments() throws URISyntaxException {
+    public void testDepositWithNoArguments() {
         Command deposit = new Command(DEPOSIT, new String[]{});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
@@ -219,7 +218,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testDepositWithMoreArguments() throws URISyntaxException {
+    public void testDepositWithMoreArguments() {
         Command deposit = new Command(DEPOSIT, new String[]{testUser.getName(), testUser.getPassword(), "1000.00"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
@@ -232,7 +231,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testLogoutSuccess() throws URISyntaxException {
+    public void testLogoutSuccess() {
         Command logout = new Command(LOGOUT, new String[]{});
 
         String expected = String.format("%s successfully logout.", testUser.getName());
@@ -242,7 +241,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testLogoutWhenNotLoggedIn() throws URISyntaxException {
+    public void testLogoutWhenNotLoggedIn() {
         Command logout = new Command(LOGOUT, new String[]{});
 
         String expected = "You are not logged in.";
@@ -252,7 +251,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testLogoutWithMoreArguments() throws URISyntaxException {
+    public void testLogoutWithMoreArguments() {
         Command logout = new Command(LOGOUT, new String[]{"RandomArgument"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
@@ -265,7 +264,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testDisconnectSuccessWhenNotLoggedIn() throws URISyntaxException {
+    public void testDisconnectSuccessWhenNotLoggedIn() {
         Command disconnect = new Command(DISCONNECT, new String[]{});
 
         String expected = "Disconnected from the server.";
@@ -275,7 +274,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testDisconnectSuccessWhenLoggedIn() throws URISyntaxException {
+    public void testDisconnectSuccessWhenLoggedIn() {
         Command disconnect = new Command(DISCONNECT, new String[]{});
 
         String expected = "Disconnected from the server.";
@@ -286,7 +285,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testDisconnectWithMoreArguments() throws URISyntaxException {
+    public void testDisconnectWithMoreArguments() {
         Command disconnect = new Command(DISCONNECT, new String[]{"Extra Arguments"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
@@ -298,7 +297,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testHelp() throws URISyntaxException {
+    public void testHelp() {
         Command help = new Command(HELP, new String[]{});
 
         String actual = commandExecutor.execute(null, help);
@@ -317,7 +316,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testHelpWithMoreArguments() throws URISyntaxException {
+    public void testHelpWithMoreArguments() {
         Command help = new Command(HELP, new String[]{"Extra Arguments"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
@@ -329,7 +328,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testListOfferingsWhenNotLoggedIn() throws URISyntaxException {
+    public void testListOfferingsWhenNotLoggedIn() {
         Command listofferings = new Command(OFFERINGS, new String[]{});
 
         String expected = "You are not logged in.";
@@ -339,7 +338,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testListOfferingsSuccess() throws URISyntaxException {
+    public void testListOfferingsSuccess() {
         Command listofferings = new Command(OFFERINGS, new String[]{});
 
         String expected = "Offerings:";
@@ -353,7 +352,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testListOfferingsWithMoreArguments() throws URISyntaxException {
+    public void testListOfferingsWithMoreArguments() {
         Command listofferings = new Command(OFFERINGS, new String[]{"Extra Arguments"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
@@ -365,7 +364,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testRequestOfferings() throws URISyntaxException {
+    public void testRequestOfferings() {
         Command requestofferings = new Command(REQUEST_OFFERINGS, new String[]{});
 
         String expected = "Successfully requested offerings.";
@@ -375,7 +374,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenNotLoggedIn() throws URISyntaxException {
+    public void testBuyWhenNotLoggedIn() {
         Command buy = new Command(BUY, new String[]{"--offering=something", "--money=something"});
 
         String expected = "You are not logged in.";
@@ -385,7 +384,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenNoSuchCrypto() throws URISyntaxException {
+    public void testBuyWhenNoSuchCrypto() {
         Command buy = new Command(BUY, new String[]{"--offering=something", "--money=something"});
 
         String expected = "No such cryptocurrency available in the offers.";
@@ -395,7 +394,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenUserDontHaveEnoughMoney() throws URISyntaxException {
+    public void testBuyWhenUserDontHaveEnoughMoney() {
         Command buy = new Command(BUY, new String[]{"--offering=BTC", "--money=1000000"});
 
         String expected = String.format("%s don't have enough money.", testUser.getName());
@@ -405,7 +404,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuySuccess() throws URISyntaxException {
+    public void testBuySuccess() {
         testUser.deposit(10000);
         Command buy = new Command(BUY, new String[]{"--offering=BTC", "--money=10000"});
 
@@ -417,7 +416,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenMoreArguments() throws URISyntaxException {
+    public void testBuyWhenMoreArguments() {
         Command buy = new Command(BUY, new String[]{"--offering=BTC", "--money=10000", "Third argument"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
@@ -428,7 +427,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenLessArguments() throws URISyntaxException {
+    public void testBuyWhenLessArguments() {
 
         Command buy = new Command(BUY, new String[]{"--offering=BTC"});
 
@@ -440,7 +439,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenFirstArgumentIsNotCorrect() throws URISyntaxException {
+    public void testBuyWhenFirstArgumentIsNotCorrect() {
         Command buy = new Command(BUY, new String[]{"--crypto=BTC", "--money=10000"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
@@ -451,7 +450,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenSecondArgumentIsNotCorrect() throws URISyntaxException {
+    public void testBuyWhenSecondArgumentIsNotCorrect() {
         Command buy = new Command(BUY, new String[]{"--offering=BTC", "--dollars=10000"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
@@ -462,7 +461,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenFirstArgumentDoNotHaveCryptoID() throws URISyntaxException {
+    public void testBuyWhenFirstArgumentDoNotHaveCryptoID() {
         Command buy = new Command(BUY, new String[]{"--offering=", "--dollars=10000"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
@@ -473,7 +472,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenSecondArgumentDoNotHaveMoney() throws URISyntaxException {
+    public void testBuyWhenSecondArgumentDoNotHaveMoney() {
         Command buy = new Command(BUY, new String[]{"--offering=BTC", "--dollars="});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
@@ -484,7 +483,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testSellWhenNotLoggedIn() throws URISyntaxException {
+    public void testSellWhenNotLoggedIn() {
         Command sell = new Command(SELL, new String[]{"--offering=BTC"});
 
         String expected = "You are not logged in.";
@@ -494,7 +493,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testSellSuccess() throws URISyntaxException {
+    public void testSellSuccess() {
         testUser.deposit(1);
         testUser.buy(new Offer("BTC", "Bitcoin", 1, 1.00), 1.00);
         Command sell = new Command(SELL, new String[]{"--offering=BTC"});
@@ -506,7 +505,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testSellWhenNoSuchCryptoInWallet() throws URISyntaxException {
+    public void testSellWhenNoSuchCryptoInWallet() {
         Command sell = new Command(SELL, new String[]{"--offering=BTC"});
 
         String expected = "Cryptocurrency not available in the wallet.";
@@ -516,7 +515,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testSellWhenNoSuchCryptoInOffers() throws URISyntaxException {
+    public void testSellWhenNoSuchCryptoInOffers() {
         Command sell = new Command(SELL, new String[]{"--offering=StrangeCryptocurrency"});
 
         String expected = "No such cryptocurrency available in the offers.";
@@ -526,7 +525,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testSellWithMoreArguments() throws URISyntaxException {
+    public void testSellWithMoreArguments() {
         Command sell = new Command(SELL, new String[]{"--offering=BTC", "Extra argument"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
@@ -537,7 +536,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testSellWithLessArguments() throws URISyntaxException {
+    public void testSellWithLessArguments() {
         Command sell = new Command(SELL, new String[]{});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
@@ -548,7 +547,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testSellWhenArgumentDoNotHaveCryptoID() throws URISyntaxException {
+    public void testSellWhenArgumentDoNotHaveCryptoID() {
         Command sell = new Command(SELL, new String[]{"--offering="});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
@@ -559,7 +558,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testWalletSummaryWhenNotLoggedIn() throws URISyntaxException {
+    public void testWalletSummaryWhenNotLoggedIn() {
         Command summary = new Command(SUMMARY, new String[]{});
 
         String expected = "You are not logged in.";
@@ -569,7 +568,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testWalletSummarySuccess() throws URISyntaxException {
+    public void testWalletSummarySuccess() {
         Command summary = new Command(SUMMARY, new String[]{});
 
         String firstLineExpected = "Amount of money in the wallet:";
@@ -595,7 +594,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testWalletSummaryMoreArguments() throws URISyntaxException {
+    public void testWalletSummaryMoreArguments() {
         Command summary = new Command(SUMMARY, new String[]{"Extra_argument"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, SUMMARY, 0, SUMMARY);
@@ -605,7 +604,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testWalletOverallSummaryWhenNotLoggedIn() throws URISyntaxException {
+    public void testWalletOverallSummaryWhenNotLoggedIn() {
         Command overall_summary = new Command(OVERALL_SUMMARY, new String[]{});
 
         String expected = "You are not logged in.";
@@ -615,7 +614,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testWalletOverallSummarySuccess() throws URISyntaxException {
+    public void testWalletOverallSummarySuccess() {
         Command overall_summary = new Command(OVERALL_SUMMARY, new String[]{});
 
         String firstLineExpected = "Amount of money in the wallet:";
@@ -646,7 +645,7 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testWalletOverallSummaryMoreArguments() throws URISyntaxException {
+    public void testWalletOverallSummaryMoreArguments() {
         Command overall_summary = new Command(OVERALL_SUMMARY, new String[]{"Extra_argument"});
 
         String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, OVERALL_SUMMARY, 0, OVERALL_SUMMARY);

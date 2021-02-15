@@ -67,8 +67,8 @@ public class WalletTest {
 
         assertEquals("Unexpected behaviour of 'addCrypto'", "BTC", crypto.getId());
         assertEquals("Unexpected behaviour of 'addCrypto'", "Bitcoin", crypto.getName());
-        assertEquals("Unexpected behaviour of 'addCrypto'", 1000, crypto.getMoney_amount(), delta15);
-        assertEquals("Unexpected behaviour of 'addCrypto'", 0.1, crypto.getCrypto_amount(), delta1);
+        assertEquals("Unexpected behaviour of 'addCrypto'", 1000, crypto.getMoneyAmount(), delta15);
+        assertEquals("Unexpected behaviour of 'addCrypto'", 0.1, crypto.getCryptoAmount(), delta1);
         assertEquals("Unexpected behaviour of 'addCrypto'", 10000, crypto.getPrice(), delta15);
 
     }

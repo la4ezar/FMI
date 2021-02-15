@@ -46,7 +46,7 @@ public class CryptocurrencyWalletClient {
             executor.shutdown();
         } catch (IOException e) {
             System.err.println("Unable to connect to the server. Try again later or contact administrator.");
-            e.printStackTrace(new PrintWriter(new FileOutputStream("errors.txt", true)));
+            e.printStackTrace(new PrintWriter(new FileOutputStream("errors.txt", true), true));
         }
     }
 
