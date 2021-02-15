@@ -44,6 +44,16 @@ public class CommandExecutorTest {
     }
 
     @Test
+    public void testDefault() throws URISyntaxException {
+        Command unknown_command = new Command("Unknown command", new String[]{});
+
+        String expected = "Unknown command.";
+        String actual = commandExecutor.execute(null, unknown_command);
+
+        assertEquals("Unexpected return for 'default' section.", expected, actual);
+    }
+
+    @Test
     public void testRegisterSuccess() throws URISyntaxException {
         users.clear();
         Command register = new Command(REGISTER, new String[]{testUser.getName(), testUser.getPassword()});
