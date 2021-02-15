@@ -573,17 +573,25 @@ public class CommandExecutorTest {
         Command summary = new Command(SUMMARY, new String[]{});
 
         String firstLineExpected = "Amount of money in the wallet:";
-        String secondLineExpected = "Cryptocurrencies:";
+        String secondLineExpected = "Amount of money invested:";
+        String thirdLineExpected = String.format("%-5s %-20s %-30s %-30s %-30s",
+                "ID", "Cryptocurrency", "Money amount(USD)", "Crypto amount", "Crypto price(USD)");
+        String fourthLineExpected = String.format("%-5s %-20s %-30s %-30s %-30s",
+                "_".repeat(5),  "_".repeat(20),  "_".repeat(30),  "_".repeat(30),  "_".repeat(30));
 
         String actual = commandExecutor.execute(testUser, summary);
         String[] actualLines = actual.split(System.lineSeparator());
-        assertTrue("Unexpected return for 'summary'", actualLines.length >= 2);
+        assertTrue("Unexpected return for 'summary'", actualLines.length >= 4);
 
         String firstLineActual = actualLines[0].substring(0, actualLines[0].lastIndexOf(':') + 1);
-        String secondLineActual = actualLines[1];
+        String secondLineActual = actualLines[1].substring(0, actualLines[1].lastIndexOf(':') + 1);
+        String thirdLineActual = actualLines[2];
+        String fourthLineActual = actualLines[3];
 
         assertEquals("Unexpected return for 'summary'", firstLineExpected, firstLineActual);
         assertEquals("Unexpected return for 'summary'", secondLineExpected, secondLineActual);
+        assertEquals("Unexpected return for 'summary'", thirdLineExpected, thirdLineActual);
+        assertEquals("Unexpected return for 'summary'", fourthLineExpected, fourthLineActual);
     }
 
     @Test
@@ -611,21 +619,30 @@ public class CommandExecutorTest {
         Command overall_summary = new Command(OVERALL_SUMMARY, new String[]{});
 
         String firstLineExpected = "Amount of money in the wallet:";
-        String secondLineExpected = "Overall Net P&L:";
-        String thirdLineExpected = String.format("%-5s %-20s %-30s %-30s %s",
-                "ID", "Cryptocurrency", "Net P&L", "Current price", "Change");
+
+        String secondLineExpected = String.format("Amount of money invested:");
+        String thirdLineExpected = "Overall Net P&L:";
+        String fourthLineExpected = String.format("%-5s %-20s %-30s %-30s %s",
+                "ID", "Cryptocurrency", "Net P&L", "Current price(USD)", "Change(%)");
+        // underlines
+        String fifthLineExpected = String.format("%-5s %-20s %-30s %-30s %s",
+                "_".repeat(5),  "_".repeat(20),  "_".repeat(30),  "_".repeat(30),  "_".repeat(10));
 
         String actual = commandExecutor.execute(testUser, overall_summary);
         String[] actualLines = actual.split(System.lineSeparator());
-        assertTrue("Unexpected return for 'overall_summary'", actualLines.length >= 3);
+        assertTrue("Unexpected return for 'overall_summary'", actualLines.length >= 5);
 
         String firstLineActual = actualLines[0].substring(0, actualLines[0].lastIndexOf(':') + 1);
         String secondLineActual = actualLines[1].substring(0, actualLines[1].lastIndexOf(':') + 1);
-        String thirdLineActual = actualLines[2];
+        String thirdLineActual = actualLines[2].substring(0, actualLines[2].lastIndexOf(':') + 1);
+        String fourthLineActual = actualLines[3];
+        String fifthLineActual = actualLines[4];
 
         assertEquals("Unexpected return for 'overall_summary'", firstLineExpected, firstLineActual);
         assertEquals("Unexpected return for 'overall_summary'", secondLineExpected, secondLineActual);
         assertEquals("Unexpected return for 'overall_summary'", thirdLineExpected, thirdLineActual);
+        assertEquals("Unexpected return for 'overall_summary'", fourthLineExpected, fourthLineActual);
+        assertEquals("Unexpected return for 'overall_summary'", fifthLineExpected, fifthLineActual);
     }
 
     @Test
