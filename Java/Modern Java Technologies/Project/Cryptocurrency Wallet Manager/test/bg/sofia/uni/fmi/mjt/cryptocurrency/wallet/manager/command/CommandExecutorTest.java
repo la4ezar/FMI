@@ -2,18 +2,17 @@ package bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.command;
 
 import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.offer.Offer;
 import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.user.User;
-import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.wallet.Wallet;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+
 
 public class CommandExecutorTest {
     private static final String INVALID_ARGS_COUNT_MESSAGE_FORMAT
@@ -33,18 +32,20 @@ public class CommandExecutorTest {
 
     private final User testUser = new User("Lacho", "123");
 
-    Map<String, User> users;
-    private CommandExecutor commandExecutor;
+    private static Map<String, User> users;
+    private static CommandExecutor commandExecutor;
 
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void offeringsRequest() throws URISyntaxException {
         users = new HashMap<>();
         commandExecutor = new CommandExecutor(users);
+        commandExecutor.request_offerings();
     }
 
     @Test
     public void testRegisterSuccess() throws URISyntaxException {
+        users.clear();
         Command register = new Command(REGISTER, new String[]{testUser.getName(), testUser.getPassword()});
 
         String expected = String.format("%s successfully registered.", testUser.getName());
@@ -331,10 +332,14 @@ public class CommandExecutorTest {
     public void testListOfferingsSuccess() throws URISyntaxException {
         Command listofferings = new Command(OFFERINGS, new String[]{});
 
-        String expected = String.format("Offerings:%n");
+        String expected = "Offerings:";
         String actual = commandExecutor.execute(testUser, listofferings);
+        String[] actualLines = actual.split(System.lineSeparator());
+        assertTrue("Unexpected return for 'list-offerings'", actualLines.length > 0);
+        assertEquals("Unexpected return for 'list-offerings'", expected, actualLines[0]);
+        assertTrue("Unexpected offerings number return for 'list-offerings'",
+                actualLines.length - 1 <= 100);
 
-        assertEquals("Unexpected return for 'list-offerings'", expected, actual);
     }
 
     @Test
@@ -360,53 +365,266 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenNotLoggedIn() {
+    public void testBuyWhenNotLoggedIn() throws URISyntaxException {
+        Command buy = new Command(BUY, new String[]{"--offering=something", "--money=something"});
 
+        String expected = "You are not logged in.";
+        String actual = commandExecutor.execute(null, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
     @Test
-    public void testBuyWhenNoSuchCrypto() {
+    public void testBuyWhenNoSuchCrypto() throws URISyntaxException {
+        Command buy = new Command(BUY, new String[]{"--offering=something", "--money=something"});
 
+        String expected = "No such cryptocurrency available in the offers.";
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
     @Test
-    public void testBuyWhenUserDontHaveEnoughMoney() {
+    public void testBuyWhenUserDontHaveEnoughMoney() throws URISyntaxException {
+        Command buy = new Command(BUY, new String[]{"--offering=BTC", "--money=1000000"});
 
+        String expected = String.format("%s don't have enough money.", testUser.getName());
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
     @Test
-    public void testBuySuccess() {
+    public void testBuySuccess() throws URISyntaxException {
+        testUser.deposit(10000);
+        Command buy = new Command(BUY, new String[]{"--offering=BTC", "--money=10000"});
 
+        String expected = String.format("%s successfully buy %s for %f USD.",
+                testUser.getName(), "Bitcoin", 10000.00);
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
     @Test
-    public void testBuyWhenMoreArguments() {
+    public void testBuyWhenMoreArguments() throws URISyntaxException {
+        Command buy = new Command(BUY, new String[]{"--offering=BTC", "--money=10000", "Third argument"});
 
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
+                BUY + " --offering=<offering_code> --money=<amount>");
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
     @Test
-    public void testBuyWhenLessArguments() {
+    public void testBuyWhenLessArguments() throws URISyntaxException {
 
+        Command buy = new Command(BUY, new String[]{"--offering=BTC"});
+
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
+                BUY + " --offering=<offering_code> --money=<amount>");
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
     @Test
-    public void testBuyWhenFirstArgumentIsNotCorrect() {
+    public void testBuyWhenFirstArgumentIsNotCorrect() throws URISyntaxException {
+        Command buy = new Command(BUY, new String[]{"--crypto=BTC", "--money=10000"});
 
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
+                BUY + " --offering=<offering_code> --money=<amount>");
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
     @Test
-    public void testBuyWhenSecondArgumentIsNotCorrect() {
+    public void testBuyWhenSecondArgumentIsNotCorrect() throws URISyntaxException {
+        Command buy = new Command(BUY, new String[]{"--offering=BTC", "--dollars=10000"});
 
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
+                BUY + " --offering=<offering_code> --money=<amount>");
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
     @Test
-    public void testBuyWhenFirstArgumentDontHaveCryptoID() {
+    public void testBuyWhenFirstArgumentDoNotHaveCryptoID() throws URISyntaxException {
+        Command buy = new Command(BUY, new String[]{"--offering=", "--dollars=10000"});
 
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
+                BUY + " --offering=<offering_code> --money=<amount>");
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
     @Test
-    public void testBuyWhenSecondArgumentDontHaveMoney() {
+    public void testBuyWhenSecondArgumentDoNotHaveMoney() throws URISyntaxException {
+        Command buy = new Command(BUY, new String[]{"--offering=BTC", "--dollars="});
 
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
+                BUY + " --offering=<offering_code> --money=<amount>");
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
     }
 
+    @Test
+    public void testSellWhenNotLoggedIn() throws URISyntaxException {
+        Command sell = new Command(SELL, new String[]{"--offering=BTC"});
+
+        String expected = "You are not logged in.";
+        String actual = commandExecutor.execute(null, sell);
+
+        assertEquals("Unexpected return for 'sell'", expected, actual);
+    }
+
+    @Test
+    public void testSellSuccess() throws URISyntaxException {
+        testUser.deposit(1);
+        testUser.buy(new Offer("BTC", "Bitcoin", 1, 1.00), 1.00);
+        Command sell = new Command(SELL, new String[]{"--offering=BTC"});
+
+        String expected = String.format("%s successfully sold %s", testUser.getName(), "BTC");
+        String actual = commandExecutor.execute(testUser, sell);
+
+        assertEquals("Unexpected return for 'sell'", expected, actual);
+    }
+
+    @Test
+    public void testSellWhenNoSuchCryptoInWallet() throws URISyntaxException {
+        Command sell = new Command(SELL, new String[]{"--offering=BTC"});
+
+        String expected = "Cryptocurrency not available in the wallet.";
+        String actual = commandExecutor.execute(testUser, sell);
+
+        assertEquals("Unexpected return for 'sell'", expected, actual);
+    }
+
+    @Test
+    public void testSellWhenNoSuchCryptoInOffers() throws URISyntaxException {
+        Command sell = new Command(SELL, new String[]{"--offering=StrangeCryptocurrency"});
+
+        String expected = "No such cryptocurrency available in the offers.";
+        String actual = commandExecutor.execute(testUser, sell);
+
+        assertEquals("Unexpected return for 'sell'", expected, actual);
+    }
+
+    @Test
+    public void testSellWithMoreArguments() throws URISyntaxException {
+        Command sell = new Command(SELL, new String[]{"--offering=BTC", "Extra argument"});
+
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
+                SELL, 1, SELL + " --offering=<offering_code>");
+        String actual = commandExecutor.execute(testUser, sell);
+
+        assertEquals("Unexpected return for 'sell'", expected, actual);
+    }
+
+    @Test
+    public void testSellWithLessArguments() throws URISyntaxException {
+        Command sell = new Command(SELL, new String[]{});
+
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
+                SELL, 1, SELL + " --offering=<offering_code>");
+        String actual = commandExecutor.execute(testUser, sell);
+
+        assertEquals("Unexpected return for 'sell'", expected, actual);
+    }
+
+    @Test
+    public void testSellWhenArgumentDoNotHaveCryptoID() throws URISyntaxException {
+        Command sell = new Command(SELL, new String[]{"--offering="});
+
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT,
+                SELL, 1, SELL + " --offering=<offering_code>");
+        String actual = commandExecutor.execute(testUser, sell);
+
+        assertEquals("Unexpected return for 'sell'", expected, actual);
+    }
+
+    @Test
+    public void testWalletSummaryWhenNotLoggedIn() throws URISyntaxException {
+        Command summary = new Command(SUMMARY, new String[]{});
+
+        String expected = "You are not logged in.";
+        String actual = commandExecutor.execute(null, summary);
+
+        assertEquals("Unexpected return for 'summary'", expected, actual);
+    }
+
+    @Test
+    public void testWalletSummarySuccess() throws URISyntaxException {
+        Command summary = new Command(SUMMARY, new String[]{});
+
+        String firstLineExpected = "Amount of money in the wallet:";
+        String secondLineExpected = "Cryptocurrencies:";
+
+        String actual = commandExecutor.execute(testUser, summary);
+        String[] actualLines = actual.split(System.lineSeparator());
+        assertTrue("Unexpected return for 'summary'", actualLines.length >= 2);
+
+        String firstLineActual = actualLines[0].substring(0, actualLines[0].lastIndexOf(':') + 1);
+        String secondLineActual = actualLines[1];
+
+        assertEquals("Unexpected return for 'summary'", firstLineExpected, firstLineActual);
+        assertEquals("Unexpected return for 'summary'", secondLineExpected, secondLineActual);
+    }
+
+    @Test
+    public void testWalletSummaryMoreArguments() throws URISyntaxException {
+        Command summary = new Command(SUMMARY, new String[]{"Extra_argument"});
+
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, SUMMARY, 0, SUMMARY);
+        String actual = commandExecutor.execute(testUser, summary);
+
+        assertEquals("Unexpected return for 'summary'", expected, actual);
+    }
+
+    @Test
+    public void testWalletOverallSummaryWhenNotLoggedIn() throws URISyntaxException {
+        Command overall_summary = new Command(OVERALL_SUMMARY, new String[]{});
+
+        String expected = "You are not logged in.";
+        String actual = commandExecutor.execute(null, overall_summary);
+
+        assertEquals("Unexpected return for 'overall_summary'", expected, actual);
+    }
+
+    @Test
+    public void testWalletOverallSummarySuccess() throws URISyntaxException {
+        Command overall_summary = new Command(OVERALL_SUMMARY, new String[]{});
+
+        String firstLineExpected = "Amount of money in the wallet:";
+        String secondLineExpected = "Overall Net P&L:";
+        String thirdLineExpected = String.format("%-5s %-20s %-30s %-30s %s",
+                "ID", "Cryptocurrency", "Net P&L", "Current price", "Change");
+
+        String actual = commandExecutor.execute(testUser, overall_summary);
+        String[] actualLines = actual.split(System.lineSeparator());
+        assertTrue("Unexpected return for 'overall_summary'", actualLines.length >= 3);
+
+        String firstLineActual = actualLines[0].substring(0, actualLines[0].lastIndexOf(':') + 1);
+        String secondLineActual = actualLines[1].substring(0, actualLines[1].lastIndexOf(':') + 1);
+        String thirdLineActual = actualLines[2];
+
+        assertEquals("Unexpected return for 'overall_summary'", firstLineExpected, firstLineActual);
+        assertEquals("Unexpected return for 'overall_summary'", secondLineExpected, secondLineActual);
+        assertEquals("Unexpected return for 'overall_summary'", thirdLineExpected, thirdLineActual);
+    }
+
+    @Test
+    public void testWalletOverallSummaryMoreArguments() throws URISyntaxException {
+        Command overall_summary = new Command(OVERALL_SUMMARY, new String[]{"Extra_argument"});
+
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, OVERALL_SUMMARY, 0, OVERALL_SUMMARY);
+        String actual = commandExecutor.execute(testUser, overall_summary);
+
+        assertEquals("Unexpected return for 'overall_summary'", expected, actual);
+    }
 }
