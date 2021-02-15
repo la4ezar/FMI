@@ -88,7 +88,8 @@ public class CryptocurrencyWalletServer {
                             } catch (IOException e) {
                                 clientChannel.close();
                                 System.out.println("Error occurred while processing client request: " + e.getMessage());
-                                e.printStackTrace(new PrintWriter("server_errors.txt"));
+                                e.printStackTrace(new PrintWriter(
+                                                  new FileOutputStream("errors.txt", true)));
                             }
                         } else if (key.isAcceptable()) {
                             accept(selector, key);
@@ -99,7 +100,7 @@ public class CryptocurrencyWalletServer {
                 } catch (URISyntaxException e) {
                     System.out.println("Error occurred while creating the URI for offerings request: "
                                         + e.getMessage());
-                    e.printStackTrace(new PrintWriter("server_errors.txt"));
+                    e.printStackTrace(new PrintWriter(new FileOutputStream("errors.txt", true)));
                 }
             }
 
