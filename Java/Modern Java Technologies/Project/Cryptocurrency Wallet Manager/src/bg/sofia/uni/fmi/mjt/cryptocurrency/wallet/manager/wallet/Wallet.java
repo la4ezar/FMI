@@ -38,10 +38,6 @@ public class Wallet {
         return money;
     }
 
-    public Map<Integer, Cryptocurrency> getCryptos() {
-        return cryptos;
-    }
-
     public void addCrypto(Cryptocurrency crypto) {
         cryptos.put(numberCryptos++, crypto);
     }

@@ -19,22 +19,6 @@ public class Offer {
         return type_is_crypto;
     }
 
-    public void setIsCrypto(int type_is_crypto) {
-        this.type_is_crypto = type_is_crypto;
-    }
-
-    public void setAssetId(String asset_id) {
-        this.asset_id = asset_id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPriceUsd(double price_usd) {
-        this.price_usd = price_usd;
-    }
-
     public String getAssetId() {
         return asset_id;
     }

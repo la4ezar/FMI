@@ -33,9 +33,6 @@ public class User {
     }
 
     public boolean buy(Offer offer, double money_amount) {
-        if (wallet.getMoney() < money_amount) {
-            return false;
-        }
         if (!wallet.withdraw(money_amount)) {
             return false;
         } else {
