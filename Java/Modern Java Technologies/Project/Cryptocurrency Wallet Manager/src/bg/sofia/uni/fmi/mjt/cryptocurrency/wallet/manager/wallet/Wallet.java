@@ -1,6 +1,5 @@
 package bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.wallet;
 
-
 import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.cryptocurrency.Cryptocurrency;
 import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.offer.Offer;
 
@@ -52,7 +51,7 @@ public class Wallet {
             // sell the first opened position only
             if (entry.getValue().getId().equals(offer.getAssetId())) {
                 this.money +=
-                        offer.getPriceUsd() * entry.getValue().getCrypto_amount() - entry.getValue().getMoney_amount();
+                        offer.getPriceUsd() * entry.getValue().getCryptoAmount() - entry.getValue().getMoneyAmount();
                 it.remove();
                 return true;
             }
@@ -64,12 +63,11 @@ public class Wallet {
     private double getMoneyInvested() {
         double result = 0;
         for (Cryptocurrency crypto : cryptos.values()) {
-            result += crypto.getMoney_amount();
+            result += crypto.getMoneyAmount();
         }
 
         return result;
     }
-
 
     public String summary() {
         StringBuilder result = new StringBuilder(String.format("Amount of money in the wallet: %f%n", money));
@@ -78,11 +76,11 @@ public class Wallet {
                 "ID", "Cryptocurrency", "Money amount(USD)", "Crypto amount", "Crypto price(USD)"));
         // underlines
         result.append(String.format("%-5s %-20s %-30s %-30s %-30s%n",
-                "_".repeat(5),  "_".repeat(20),  "_".repeat(30),  "_".repeat(30),  "_".repeat(30)));
+                "_".repeat(5), "_".repeat(20), "_".repeat(30), "_".repeat(30), "_".repeat(30)));
         for (Cryptocurrency crypto : cryptos.values()) {
             result.append(String.format("%-5s %-20s %-30f %-30f %-30f%n",
-                    crypto.getId(), crypto.getName(), crypto.getMoney_amount(),
-                    crypto.getCrypto_amount(), crypto.getPrice()));
+                    crypto.getId(), crypto.getName(), crypto.getMoneyAmount(),
+                    crypto.getCryptoAmount(), crypto.getPrice()));
         }
 
         return result.toString();
@@ -93,8 +91,8 @@ public class Wallet {
         for (Map.Entry<Integer, Cryptocurrency> entry : cryptos.entrySet()) {
             int ind = offers.lastIndexOf(new Offer(entry.getValue().getId(), "", 0, 0));
             if (ind != -1) {
-                result += offers.get(ind).getPriceUsd() * entry.getValue().getCrypto_amount()
-                        - entry.getValue().getMoney_amount();
+                result += offers.get(ind).getPriceUsd() * entry.getValue().getCryptoAmount()
+                        - entry.getValue().getMoneyAmount();
             }
         }
         return result;
@@ -109,7 +107,7 @@ public class Wallet {
                 "ID", "Cryptocurrency", "Net P&L", "Current price(USD)", "Change(%)"));
         // underlines
         result.append(String.format("%-5s %-20s %-30s %-30s %s%n",
-                "_".repeat(5),  "_".repeat(20),  "_".repeat(30),  "_".repeat(30),  "_".repeat(10)));
+                "_".repeat(5), "_".repeat(20), "_".repeat(30), "_".repeat(30), "_".repeat(10)));
 
         for (Cryptocurrency crypto : cryptos.values()) {
             int ind = offers.lastIndexOf(new Offer(crypto.getId(), "", 0, 0));
@@ -118,8 +116,8 @@ public class Wallet {
                         crypto.getId(), crypto.getName(),
                         "Not available", "Not available", "Not available"));
             } else {
-                double profit_and_loss_statement = offers.get(ind).getPriceUsd() * crypto.getCrypto_amount()
-                        - crypto.getMoney_amount();
+                double profit_and_loss_statement = offers.get(ind).getPriceUsd() * crypto.getCryptoAmount()
+                        - crypto.getMoneyAmount();
                 double percent_change = (offers.get(ind).getPriceUsd() - crypto.getPrice())
                         * 100 / crypto.getPrice();
                 result.append(String.format("%-5s %-20s %-30f %-30f %.2f%%%n",

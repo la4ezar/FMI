@@ -25,11 +25,11 @@ public class Cryptocurrency {
         return id;
     }
 
-    public double getMoney_amount() {
+    public double getMoneyAmount() {
         return money_amount;
     }
 
-    public double getCrypto_amount() {
+    public double getCryptoAmount() {
         return crypto_amount;
     }
 

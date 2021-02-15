@@ -6,7 +6,15 @@ import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.user.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
@@ -16,8 +24,15 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class CryptocurrencyWalletServer {
     private static final String REQUEST_OFFERINGS = "request-list-offerings";
@@ -79,7 +94,7 @@ public class CryptocurrencyWalletServer {
                                 }
                                 System.out.println(clientInput);
 
-                                String output = commandExecutor.execute((User)key.attachment(), CommandCreator.newCommand(clientInput));
+                                String output = commandExecutor.execute((User) key.attachment(), CommandCreator.newCommand(clientInput));
 
                                 // attach/detach the SelectionKey to/from its user
                                 attachKeyToUser(key, output);
@@ -89,7 +104,7 @@ public class CryptocurrencyWalletServer {
                                 clientChannel.close();
                                 System.out.println("Error occurred while processing client request: " + e.getMessage());
                                 e.printStackTrace(new PrintWriter(
-                                                  new FileOutputStream("errors.txt", true)));
+                                        new FileOutputStream("errors.txt", true)));
                             }
                         } else if (key.isAcceptable()) {
                             accept(selector, key);
@@ -99,7 +114,7 @@ public class CryptocurrencyWalletServer {
                     }
                 } catch (URISyntaxException e) {
                     System.out.println("Error occurred while creating the URI for offerings request: "
-                                        + e.getMessage());
+                            + e.getMessage());
                     e.printStackTrace(new PrintWriter(new FileOutputStream("errors.txt", true)));
                 }
             }
@@ -143,7 +158,7 @@ public class CryptocurrencyWalletServer {
                 e.printStackTrace();
             }
         };
-        thread.scheduleAtFixedRate(get_list_offerings,0, 30, TimeUnit.MINUTES);
+        thread.scheduleAtFixedRate(get_list_offerings, 0, 30, TimeUnit.MINUTES);
     }
 
     private void configureServerSocketChannel(ServerSocketChannel channel, Selector selector) throws IOException {
@@ -238,7 +253,8 @@ public class CryptocurrencyWalletServer {
         }
         try (BufferedReader reader = new BufferedReader(new FileReader("users.json"))) {
             Gson gson = new Gson();
-            Type type = new TypeToken<HashMap<String, User>>(){}.getType();
+            Type type = new TypeToken<HashMap<String, User>>() {
+            }.getType();
             Map<String, User> fileUsers = gson.fromJson(reader, type);
             fileUsers.forEach((name, user) -> {
                 user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));

@@ -37,9 +37,6 @@ public class CommandExecutor {
     private Map<String, User> users;
     private final List<Offer> offers;
 
-    // COIN API KEY
-    // 55F0BA5A-E044-4BA5-BC0F-79ADE6277F6C
-
     public CommandExecutor(Map<String, User> users) {
         this.users = users;
         offers = new ArrayList<>();
@@ -67,11 +64,12 @@ public class CommandExecutor {
         HttpClient client = HttpClient.newBuilder().build();
         URI uri = new URI("https", "rest.coinapi.io", "/v1/assets/", null);
         HttpRequest request = HttpRequest.newBuilder()
-                .header("X-CoinAPI-Key", "55F0BA5A-E044-4BA5-BC0F-79ADE6277F6C")
+                .header("X-CoinAPI-Key", "INPUT API KEY HERE")
                 .uri(uri)
                 .build();
         Gson gson = new Gson();
-        Type type = new TypeToken<List<Offer>>(){}.getType();
+        Type type = new TypeToken<List<Offer>>() {
+        }.getType();
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body).thenAcceptAsync(x -> {
             offers.addAll(gson.fromJson(x, type));
