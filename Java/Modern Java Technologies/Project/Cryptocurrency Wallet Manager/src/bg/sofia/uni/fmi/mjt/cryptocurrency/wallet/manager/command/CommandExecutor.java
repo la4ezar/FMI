@@ -40,9 +40,35 @@ public class CommandExecutor {
     private Map<String, User> users;
     private final List<Offer> offers;
 
+    // COIN API KEY
+    // 55F0BA5A-E044-4BA5-BC0F-79ADE6277F6C
+    HttpClient client;
+    URI uri;
+    HttpRequest request;
+
     public CommandExecutor(Map<String, User> users) {
         this.users = users;
         offers = new ArrayList<>();
+        client = HttpClient.newBuilder().build();
+
+        uri = null;
+        try {
+            uri = new URI("https", "rest.coinapi.io", "/v1/assets/", null);
+        } catch (URISyntaxException e) {
+            System.out.println("Error occurred while creating the URI for offerings request: " + e.getMessage());
+            try {
+                e.printStackTrace(new PrintWriter(
+                        new FileOutputStream("server_errors.txt", true), true));
+            } catch (FileNotFoundException fileNotFoundException) {
+                System.out.println("File 'server_errors.txt' was not found.");
+                fileNotFoundException.printStackTrace();
+            }
+        }
+
+        request = HttpRequest.newBuilder()
+                .header("X-CoinAPI-Key", "55F0BA5A-E044-4BA5-BC0F-79ADE6277F6C")
+                .uri(uri)
+                .build();
     }
 
     public String execute(User user, Command cmd) {
@@ -64,29 +90,11 @@ public class CommandExecutor {
     }
 
     public String request_offerings() {
-        HttpClient client = HttpClient.newBuilder().build();
-
-        URI uri = null;
-        try {
-            uri = new URI("https", "rest.coinapi.io", "/v1/assets/", null);
-        } catch (URISyntaxException e) {
-            System.out.println("Error occurred while creating the URI for offerings request: " + e.getMessage());
-            try {
-                e.printStackTrace(new PrintWriter(
-                        new FileOutputStream("server_errors.txt", true), true));
-            } catch (FileNotFoundException fileNotFoundException) {
-                System.out.println("File 'server_errors.txt' was not found.");
-                fileNotFoundException.printStackTrace();
-            }
-        }
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .header("X-CoinAPI-Key", "EXAMPLE API KEY")
-                .uri(uri)
-                .build();
         Gson gson = new Gson();
-        Type type = new TypeToken<List<Offer>>() {
-        }.getType();
+        Type type = new TypeToken<List<Offer>>(){}.getType();
+
+        offers.clear();
+
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body).thenAcceptAsync(x -> {
             offers.addAll(gson.fromJson(x, type));
@@ -103,8 +111,7 @@ public class CommandExecutor {
         if (user == null) {
             return "You are not logged in.";
         }
-        //offers.clear();
-        //request_offerings();
+
         StringBuilder response = new StringBuilder(String.format("Offerings:%n"));
 
         offers.stream()
