@@ -5,7 +5,9 @@ import bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.user.User;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.LinkedList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +29,6 @@ public class CommandExecutorTest {
     private static final String LOGOUT = "logout";
     private static final String DISCONNECT = "disconnect";
     private static final String HELP = "help";
-    private static final String REQUEST_OFFERINGS = "request-list-offerings";
 
     private final User testUser = new User("Lacho", "123");
 
@@ -36,10 +37,12 @@ public class CommandExecutorTest {
 
 
     @BeforeClass
-    public static void offeringsRequest() {
+    public static void offeringsSetUp() {
         users = new HashMap<>();
-        commandExecutor = new CommandExecutor(users);
-        commandExecutor.request_offerings();
+        List<Offer> offers = new LinkedList<>();
+        offers.add(new Offer("BTC", "Bitcoin", 1, 1000));
+        commandExecutor = new CommandExecutor(users, offers);
+        //commandExecutor.request_offerings();
     }
 
     @Test
@@ -373,6 +376,7 @@ public class CommandExecutorTest {
                 expected, actual);
     }
 
+    /*
     @Test
     public void testRequestOfferings() {
         Command requestofferings = new Command(REQUEST_OFFERINGS, new String[]{});
@@ -382,6 +386,7 @@ public class CommandExecutorTest {
 
         assertEquals("Unexpected return for server requesting offerings", expected, actual);
     }
+     */
 
     @Test
     public void testBuyWhenNotLoggedIn() {
@@ -404,7 +409,18 @@ public class CommandExecutorTest {
     }
 
     @Test
-    public void testBuyWhenUserDontHaveEnoughMoney() {
+    public void testBuyWithNoOfferingCode() {
+        Command buy = new Command(BUY, new String[]{"--offering=", "--money=1000"});
+
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, BUY, 2,
+                BUY + " --offering=<offering_code> --money=<amount>");
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
+    }
+
+    @Test
+    public void testBuyWhenUserDoNotHaveEnoughMoney() {
         Command buy = new Command(BUY, new String[]{"--offering=BTC", "--money=1000000"});
 
         String expected = String.format("%s don't have enough money.", testUser.getName());
@@ -535,6 +551,17 @@ public class CommandExecutorTest {
     }
 
     @Test
+    public void testSellWithNoOfferingCode() {
+        Command sell = new Command(SELL, new String[]{"--offering="});
+
+        String expected = String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, SELL, 1,
+                SELL + " --offering=<offering_code>");
+        String actual = commandExecutor.execute(testUser, sell);
+
+        assertEquals("Unexpected return for 'sell'", expected, actual);
+    }
+
+    @Test
     public void testSellWhenNoSuchCryptoInOffers() {
         Command sell = new Command(SELL, new String[]{"--offering=StrangeCryptocurrency"});
 
@@ -639,7 +666,7 @@ public class CommandExecutorTest {
 
         String firstLineExpected = "Amount of money in the wallet:";
 
-        String secondLineExpected = String.format("Amount of money invested:");
+        String secondLineExpected = "Amount of money invested:";
         String thirdLineExpected = "Overall Net P&L:";
         String fourthLineExpected = String.format("%-5s %-20s %-30s %-30s %s",
                 "ID", "Cryptocurrency", "Net P&L", "Current price(USD)", "Change(%)");

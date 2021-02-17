@@ -15,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class CommandExecutor {
 
     public CommandExecutor(Map<String, User> users) {
         this.users = users;
-        offers = new ArrayList<>();
+        offers = new LinkedList<>();
         client = HttpClient.newBuilder().build();
 
         URI uri = null;
@@ -68,6 +69,14 @@ public class CommandExecutor {
                 .header("X-CoinAPI-Key", "55F0BA5A-E044-4BA5-BC0F-79ADE6277F6C")
                 .uri(uri)
                 .build();
+    }
+
+    public CommandExecutor(Map<String, User> users, List<Offer> offers) {
+        this.users = users;
+        this.offers = offers;
+
+        client = null;
+        request = null;
     }
 
     public String execute(User user, Command cmd) {

@@ -64,6 +64,7 @@ public class CryptocurrencyWalletClient {
                 if ((line = reader.readLine()) != null) {
                     System.out.println(line);
                     if (line.equals("Disconnected from the server.")) {
+                        System.out.println("Press Enter to exit the console.");
                         isClientWorking = false;
                         return line;
                     }

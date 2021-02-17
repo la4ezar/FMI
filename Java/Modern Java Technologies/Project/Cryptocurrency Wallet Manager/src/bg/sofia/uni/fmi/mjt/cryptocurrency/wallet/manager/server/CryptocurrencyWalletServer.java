@@ -18,10 +18,7 @@ import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -182,6 +179,10 @@ public class CryptocurrencyWalletServer {
         buffer.flip();
 
         clientChannel.write(buffer);
+
+        if (output.equals("Disconnected from the server." + System.lineSeparator())) {
+            clientChannel.close();
+        }
     }
 
     private void accept(Selector selector, SelectionKey key) throws IOException {
