@@ -37,21 +37,20 @@ public class CommandExecutor {
     // Server commands
     private static final String REQUEST_OFFERINGS = "request-list-offerings";
 
-    private Map<String, User> users;
+    private final Map<String, User> users;
     private final List<Offer> offers;
 
     // COIN API KEY
     // 55F0BA5A-E044-4BA5-BC0F-79ADE6277F6C
-    HttpClient client;
-    URI uri;
-    HttpRequest request;
+    private final HttpClient client;
+    private final HttpRequest request;
 
     public CommandExecutor(Map<String, User> users) {
         this.users = users;
         offers = new ArrayList<>();
         client = HttpClient.newBuilder().build();
 
-        uri = null;
+        URI uri = null;
         try {
             uri = new URI("https", "rest.coinapi.io", "/v1/assets/", null);
         } catch (URISyntaxException e) {
@@ -127,7 +126,7 @@ public class CommandExecutor {
         if (args.length != 2) {
             return String.format(INVALID_ARGS_COUNT_MESSAGE_FORMAT, REGISTER, 2, REGISTER + " <username> <password>");
         }
-        StringBuilder response = new StringBuilder("");
+        StringBuilder response = new StringBuilder();
         if (user != null) {
             return "You are already logged in.";
         }
@@ -155,10 +154,8 @@ public class CommandExecutor {
             if (current_user.getIsLogged()) {
                 return "Other user already logged in.";
             } else {
-                StringBuilder response = new StringBuilder("");
-                response.append(String.format("%s successfully logged in.", args[0]));
                 current_user.login();
-                return response.toString();
+                return String.format("%s successfully logged in.", args[0]);
             }
         }
     }
@@ -170,7 +167,13 @@ public class CommandExecutor {
         if (user == null) {
             return "You are not logged in.";
         }
-        user.deposit(Double.parseDouble(args[0]));
+
+        try {
+            double money = Double.parseDouble(args[0]);
+            user.deposit(money);
+        } catch(NumberFormatException nfe) {
+            return "<money_amount> must be number.";
+        }
 
         return String.format("%s successfully deposited %f", user.getName(), Double.parseDouble(args[0]));
     }
@@ -199,11 +202,16 @@ public class CommandExecutor {
         if (ind == -1) {
             return "No such cryptocurrency available in the offers.";
         } else {
-            if (user.buy(offers.get(ind), Double.parseDouble(args[1]))) {
-                return String.format("%s successfully buy %s for %f USD.",
-                        user.getName(), offers.get(ind).getName(), Double.parseDouble(args[1]));
-            } else {
-                return String.format("%s don't have enough money.", user.getName());
+            try {
+                double money = Double.parseDouble(args[1]);
+                if (user.buy(offers.get(ind), money)) {
+                    return String.format("%s successfully buy %s for %f USD.",
+                            user.getName(), offers.get(ind).getName(), money);
+                } else {
+                    return String.format("%s don't have enough money.", user.getName());
+                }
+            } catch (NumberFormatException nfe) {
+                return "<money_amount> must be number.";
             }
         }
     }
@@ -266,9 +274,7 @@ public class CommandExecutor {
             return "You are not logged in.";
         }
         user.logout();
-        StringBuilder response = new StringBuilder("");
-        response.append(String.format("%s successfully logout.", user.getName()));
-        return response.toString();
+        return String.format("%s successfully logout.", user.getName());
     }
 
     public String disconnect(User user, String[] args) {

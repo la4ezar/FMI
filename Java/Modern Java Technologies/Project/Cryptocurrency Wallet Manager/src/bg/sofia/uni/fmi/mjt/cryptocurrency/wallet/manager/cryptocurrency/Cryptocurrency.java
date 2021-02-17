@@ -3,11 +3,11 @@ package bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.cryptocurrency;
 import java.util.Objects;
 
 public class Cryptocurrency {
-    String name;
-    String id;
-    double money_amount;
-    double crypto_amount;
-    double price;
+    private final String name;
+    private final String id;
+    private final double money_amount;
+    private final double crypto_amount;
+    private final double price;
 
     public Cryptocurrency(String name, String id, double money_amount, double crypto_amount, double price) {
         this.name = name;

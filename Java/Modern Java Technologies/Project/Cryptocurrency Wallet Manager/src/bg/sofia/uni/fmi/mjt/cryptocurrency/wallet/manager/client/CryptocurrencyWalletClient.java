@@ -18,16 +18,17 @@ public class CryptocurrencyWalletClient {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 5555;
 
-    boolean isClientWorking = true;
+    private boolean isClientWorking = true;
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
         new CryptocurrencyWalletClient().start();
     }
 
-    public void start() throws FileNotFoundException {
+    public void start() {
         try (SocketChannel socketChannel = SocketChannel.open();
              BufferedReader reader = new BufferedReader(Channels.newReader(socketChannel, StandardCharsets.UTF_8));
-             PrintWriter writer = new PrintWriter(Channels.newWriter(socketChannel, StandardCharsets.UTF_8), true);
+             PrintWriter writer = new PrintWriter(
+                     Channels.newWriter(socketChannel, StandardCharsets.UTF_8), true);
              Scanner scanner = new Scanner(System.in)) {
 
             socketChannel.connect(new InetSocketAddress(SERVER_HOST, SERVER_PORT));
@@ -46,7 +47,13 @@ public class CryptocurrencyWalletClient {
             executor.shutdown();
         } catch (IOException e) {
             System.err.println("Unable to connect to the server. Try again later or contact administrator.");
-            e.printStackTrace(new PrintWriter(new FileOutputStream("errors.txt", true), true));
+            try {
+                e.printStackTrace(new PrintWriter(
+                        new FileOutputStream("client_errors.txt", true), true));
+            } catch (FileNotFoundException fileNotFoundException) {
+                System.out.println("File 'client_errors.txt' not found.");
+                fileNotFoundException.printStackTrace();
+            }
         }
     }
 

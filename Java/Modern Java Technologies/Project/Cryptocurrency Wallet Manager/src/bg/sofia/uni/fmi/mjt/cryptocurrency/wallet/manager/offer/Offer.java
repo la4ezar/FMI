@@ -3,10 +3,10 @@ package bg.sofia.uni.fmi.mjt.cryptocurrency.wallet.manager.offer;
 import java.util.Objects;
 
 public class Offer {
-    private String asset_id;
-    private String name;
-    private int type_is_crypto;
-    private double price_usd;
+    private final String asset_id;
+    private final String name;
+    private final int type_is_crypto;
+    private final double price_usd;
 
     public Offer(String asset_id, String name, int type_is_crypto, double price_usd) {
         this.asset_id = asset_id;

@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class User {
-    private String name;
+    private final String name;
     private String password;
     private boolean is_logged;
-    private Wallet wallet;
+    private final Wallet wallet;
 
     public User(String name, String password) {
         this.name = name;

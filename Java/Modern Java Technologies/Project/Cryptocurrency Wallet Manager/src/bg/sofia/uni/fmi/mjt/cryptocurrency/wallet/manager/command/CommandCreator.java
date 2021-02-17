@@ -6,6 +6,10 @@ import java.util.List;
 public class CommandCreator {
     private static List<String> getCommandArguments(String input) {
         List<String> tokens = new ArrayList<>();
+        if (input == null) {
+            tokens.add("");
+            return tokens;
+        }
         StringBuilder sb = new StringBuilder();
 
         boolean insideQuote = false;

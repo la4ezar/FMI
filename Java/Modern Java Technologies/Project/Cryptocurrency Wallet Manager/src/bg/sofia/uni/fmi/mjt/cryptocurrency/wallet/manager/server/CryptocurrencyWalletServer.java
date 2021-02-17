@@ -17,7 +17,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -93,7 +92,8 @@ public class CryptocurrencyWalletServer {
                             }
                             System.out.println(clientInput);
 
-                            String output = commandExecutor.execute((User) key.attachment(), CommandCreator.newCommand(clientInput));
+                            String output = commandExecutor.execute((User) key.attachment(),
+                                    CommandCreator.newCommand(clientInput));
 
                             // attach/detach the SelectionKey to/from its user
                             attachKeyToUser(key, output);
@@ -141,13 +141,7 @@ public class CryptocurrencyWalletServer {
     }
 
     private void request_offerings(ScheduledExecutorService thread) {
-        Runnable get_list_offerings = () -> {
-            try {
-                getListOfferings();
-            } catch (InterruptedException | IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        };
+        Runnable get_list_offerings = this::getListOfferings;
         thread.scheduleAtFixedRate(get_list_offerings, 0, 30, TimeUnit.MINUTES);
     }
 
@@ -199,7 +193,7 @@ public class CryptocurrencyWalletServer {
         accept.register(selector, SelectionKey.OP_READ);
     }
 
-    private void getListOfferings() throws InterruptedException, IOException, URISyntaxException {
+    private void getListOfferings() {
         String response = commandExecutor.execute(null, CommandCreator.newCommand(REQUEST_OFFERINGS));
         System.out.println(response);
     }
@@ -246,22 +240,23 @@ public class CryptocurrencyWalletServer {
             Type type = new TypeToken<HashMap<String, User>>() {
             }.getType();
             Map<String, User> fileUsers = gson.fromJson(reader, type);
-            fileUsers.forEach((name, user) -> {
-                user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));
-            });
+            fileUsers.forEach((name, user) ->
+                    user.setPassword(new String(Base64.getDecoder().decode(user.getPassword()))));
             users.putAll(fileUsers);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        //new CryptocurrencyWalletServer(5555).start();
+    public static void main(String[] args) {
+        new CryptocurrencyWalletServer(5555).start();
 
+        /*
         CryptocurrencyWalletServer server = new CryptocurrencyWalletServer(5555);
         Thread serverThread = new Thread(server::start);
         serverThread.start();
         serverThread.join();
         server.stop();
+         */
     }
 }

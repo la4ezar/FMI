@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Wallet {
-    int numberCryptos;
+    private int numberCryptos;
     private double money;
     // offering code -> crypto
     private final Map<Integer, Cryptocurrency> cryptos;
@@ -51,7 +51,7 @@ public class Wallet {
             // sell the first opened position only
             if (entry.getValue().getId().equals(offer.getAssetId())) {
                 this.money +=
-                        offer.getPriceUsd() * entry.getValue().getCryptoAmount() - entry.getValue().getMoneyAmount();
+                        offer.getPriceUsd() * entry.getValue().getCryptoAmount();
                 it.remove();
                 return true;
             }
