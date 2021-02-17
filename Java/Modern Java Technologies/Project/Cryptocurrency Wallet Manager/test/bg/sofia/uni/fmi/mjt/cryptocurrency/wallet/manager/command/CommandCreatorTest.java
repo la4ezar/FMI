@@ -60,4 +60,15 @@ public class CommandCreatorTest {
         assertEquals("Unexpected argument returned for command 'test \"quoted argument\"'",
                 argument, command.arguments()[0]);
     }
+
+    @Test
+    public void testCommandCreatorWithNull() {
+        Command command = CommandCreator.newCommand(null);
+
+        String commandExpected = "";
+
+        assertEquals("Unexpected command name returned for null command",
+                commandExpected, command.command());
+        assertNotNull("Command arguments should not be null", command.arguments());
+    }
 }

@@ -195,6 +195,16 @@ public class CommandExecutorTest {
     }
 
     @Test
+    public void testDepositWhenMoneyArgumentIsNotNumber() {
+        Command deposit = new Command(DEPOSIT, new String[]{"NotANumber"});
+
+        String expected = "<money_amount> must be number.";
+        String actual = commandExecutor.execute(testUser, deposit);
+
+        assertEquals("Unexpected return for 'deposit-money'", expected, actual);
+    }
+
+    @Test
     public void testDepositWhenNotLoggedIn() {
         Command deposit = new Command(DEPOSIT, new String[]{"1000,00"});
 
@@ -410,6 +420,16 @@ public class CommandExecutorTest {
 
         String expected = String.format("%s successfully buy %s for %f USD.",
                 testUser.getName(), "Bitcoin", 10000.00);
+        String actual = commandExecutor.execute(testUser, buy);
+
+        assertEquals("Unexpected return for 'buy'", expected, actual);
+    }
+
+    @Test
+    public void testBuyWhenMoneyArgumentIsNotNumber() {
+        Command buy = new Command(BUY, new String[]{"--offering=BTC", "--money=NotANumber"});
+
+        String expected = "<money_amount> must be number.";
         String actual = commandExecutor.execute(testUser, buy);
 
         assertEquals("Unexpected return for 'buy'", expected, actual);

@@ -81,7 +81,7 @@ public class WalletTest {
 
         assertTrue("Unexpected behaviour of 'sellCrypto'", actual);
         // the difference is 50 USD
-        assertEquals("Unexpected behaviour of 'sellCrypto'", 50, testWallet.getMoney(), delta15);
+        assertEquals("Unexpected behaviour of 'sellCrypto'", 1050, testWallet.getMoney(), delta15);
 
     }
 
@@ -95,7 +95,7 @@ public class WalletTest {
 
         assertTrue("Unexpected behaviour of 'sellCrypto'", actual);
         // the difference is 50 USD
-        assertEquals("Unexpected behaviour of 'sellCrypto'", 50, testWallet.getMoney(), delta15);
+        assertEquals("Unexpected behaviour of 'sellCrypto'", 1050, testWallet.getMoney(), delta15);
     }
 
     @Test
@@ -108,11 +108,11 @@ public class WalletTest {
 
         assertTrue("Unexpected behaviour of 'sellCrypto'", sell1);
         // the difference is 5 USD
-        assertEquals("Unexpected behaviour of 'sellCrypto'", 5, testWallet.getMoney(), delta15);
+        assertEquals("Unexpected behaviour of 'sellCrypto'", 105, testWallet.getMoney(), delta15);
 
         boolean sell2 = testWallet.sellCrypto(new Offer("BTC", "Bitcoin", 1, 1050));
         // the old 5 USD + the new difference which is 50 USD = 55 USD
-        assertEquals("Unexpected behaviour of 'sellCrypto'", 55, testWallet.getMoney(), delta15);
+        assertEquals("Unexpected behaviour of 'sellCrypto'", 1155, testWallet.getMoney(), delta15);
 
     }
 
